@@ -1,14 +1,29 @@
 var timerId;
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
-
-var radius = 20;
-var color = '#8bc34a';
 var g = 0.1; // acceleration due to gravity
-var x = 50; // initial horizontal position
-var y = 50; // initial vertical position
-var vx = 2; // initial horizontal speed
-var vy = 0; // initial vertical speed
+
+function Ball(radius, color) {
+  this.radius = radius;
+  this.color = color;
+  this.x = 0; // initial horizontal position
+  this.y = 0; // initial vertical position
+  this.vx = 0; // initial horizontal speed
+  this.vy = 0; // initial vertical speed
+}
+
+Ball.prototype.draw = function(context) {
+  context.fillStyle = this.color;
+  context.beginPath();
+  context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, true);
+  context.closePath();
+  context.fill();
+}
+
+var ball = new Ball(50, '#8bc34a');
+ball.x = 50;
+ball.y = 50;
+ball.vx = 2.5;
 
 window.onload = init;
 
@@ -17,31 +32,23 @@ function init() {
 }
 
 function onEachStep() {
-  vy += g; // gravity increases the vertical speed
-  x += vx; // horizontal speed increases horizontal position
-  y += vy // vertical speed increases vertical position
+  ball.vy += g; // gravity increases the vertical speed
+  ball.x += ball.vx; // horizontal speed increases horizontal position
+  ball.y += ball.vy // vertical speed increases vertical position
 
-  if (y > canvas.height - radius) { // if ball hits the ground
-    y = canvas.height - radius; // reposition it at the ground
-    vy *= -0.8; // then reverse and reduce its vertical speed
-    vx *= 0.9; // reduce horizontal speed under the influence of friction force
+  if (ball.y > canvas.height - ball.radius) { // if ball hits the ground
+    ball.y = canvas.height - ball.radius; // reposition it at the ground
+    ball.vy *= -0.8; // then reverse and reduce its vertical speed
+    ball.vx *= 0.9; // reduce horizontal speed under the influence of friction force
   }
 
-  if (x > canvas.width + radius) { // if ball goes beyond canvas
-    x = -radius; // wrap it around
+  if (ball.x > canvas.width + ball.radius) { // if ball goes beyond canvas
+    ball.x = -ball.radius; // wrap it around
   }
-  drawBall(); // draw the ball
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  ball.draw(context);
   
-  if (vx < 0.1) { // if horizontal speed is very small
+  if (ball.vx < 0.1) { // if horizontal speed is very small
     clearInterval(timerId); // stop animation
   }
 };
-
-function drawBall() {
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = color;
-  context.beginPath();
-  context.arc(x, y, radius, 0, 2 * Math.PI, true);
-  context.closePath();
-  context.fill();
-}

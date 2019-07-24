@@ -1,4 +1,4 @@
-var requestId, ball;
+var ball;
 var canvas = document.getElementById('canvas');
 var context = canvas.getContext('2d');
 var g = 0.1; // acceleration due to gravity
@@ -14,7 +14,7 @@ function init() {
 }
 
 function animFrame() {
-  requestId = requestAnimationFrame(animFrame, canvas);
+  requestAnimationFrame(animFrame, canvas);
   onEachStep();
 }
 
@@ -28,14 +28,16 @@ function onEachStep() {
     ball.vx *= 0.9; // reduce horizontal speed under the influence of friction force
   }
 
-  if (ball.x > canvas.width + ball.radius) { // if ball goes beyond canvas
-    ball.x = -ball.radius; // wrap it around
+  if (ball.x + ball.radius > canvas.width) { // if ball goes beyond canvas
+    ball.x = canvas.width - ball.radius; 
+    ball.vx *= -1;
+  }
+  
+  if (ball.x - ball.radius < 0) {
+    ball.x = ball.radius; 
+    ball.vx *= -1;
   }
 
   context.clearRect(0, 0, canvas.width, canvas.height);
   ball.draw(context);
-  
-  if (ball.vx < 0.1) { // if horizontal speed is very small
-    cancelAnimationFrame(requestId); // stop animation
-  }
 };
